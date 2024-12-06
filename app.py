@@ -32,7 +32,7 @@ except Exception as e:
     raise RuntimeError(f"Could not load logistic_model.pkl: {e}")
 
 try:
-    generation_model = torch.load("fine_tune-model.pt")  # Assuming a keras model
+    generation_model = torch.load("fine-tunned_model.pt")  # Assuming a keras model
     generation_model.eval()
 except Exception as e:
     raise RuntimeError(f"Could not load enc-dec_model.h5: {e}")
