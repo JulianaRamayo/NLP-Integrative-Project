@@ -20,7 +20,6 @@ app = FastAPI(
     description="Endpoints to determine polarity and generate opposite polarity text."
 )
 
-from model_definitions import ReviewClassifier
 
 
 # Load Models
