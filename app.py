@@ -20,9 +20,12 @@ app = FastAPI(
     description="Endpoints to determine polarity and generate opposite polarity text."
 )
 
+from model_definitions import ReviewClassifier
+
+
 # Load Models
 try:
-    logistic_model = joblib.load("logistic_model.pkl")  # Assuming this is a scikit-learn logistic regression model
+    logistic_model = load_model("dnn_model.h5")  # Assuming this is a scikit-learn logistic regression model
 except Exception as e:
     raise RuntimeError(f"Could not load logistic_model.pkl: {e}")
 
