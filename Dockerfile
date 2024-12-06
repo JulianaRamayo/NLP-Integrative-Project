@@ -24,4 +24,4 @@ ENV PORT=8000
 
 # Command to start the server
 # Make sure this matches your actual app structure and filename (app.py) and FastAPI app instance (app)
-CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "$PORT"]
+CMD ["sh", "-c", "uvicorn app:app --host 0.0.0.0 --port $PORT"]
