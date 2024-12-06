@@ -9,3 +9,10 @@ venv/
 # Ignore system files
 .DS_Store
 Thumbs.db
+.venv
+data/test.csv
+data/train.csv
+notebooks/.ipynb_checkpoints/
+notebooks/data
+__pycache__/
+models
