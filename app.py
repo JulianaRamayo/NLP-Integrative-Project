@@ -22,12 +22,12 @@ app = FastAPI(
 
 # Load Models
 try:
-    logistic_model = joblib.load("models/logistic_model.pkl")  # Assuming this is a scikit-learn logistic regression model
+    logistic_model = joblib.load("logistic_model.pkl")  # Assuming this is a scikit-learn logistic regression model
 except Exception as e:
     raise RuntimeError(f"Could not load logistic_model.pkl: {e}")
 
 try:
-    generation_model = load_model("models/fine_tune-model.h5")  # Assuming a keras model
+    generation_model = load_model("fine_tunned-model.h5")  # Assuming a keras model
 except Exception as e:
     raise RuntimeError(f"Could not load fine_tune-model.h5: {e}")
 
