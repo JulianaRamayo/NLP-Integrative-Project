@@ -20,6 +20,9 @@ app = FastAPI(
     description="Endpoints to determine polarity and generate opposite polarity text."
 )
 
+import torch
+
+
 
 
 # Load Models
@@ -29,14 +32,15 @@ except Exception as e:
     raise RuntimeError(f"Could not load logistic_model.pkl: {e}")
 
 try:
-    generation_model = load_model("enc-dec_model.h5")  # Assuming a keras model
+    generation_model = torch.load("fine_tune-model.pt")  # Assuming a keras model
+    generation_model.eval()
 except Exception as e:
     raise RuntimeError(f"Could not load enc-dec_model.h5: {e}")
 
 # Dummy tokenizer or preprocessing if needed for generation model
 # You should replace this with the actual tokenizer/preprocessing steps
 # used during training of the generative model.
-tokenizer = None 
+tokenizer = tf.keras.preprocessing.text.Tokenizer()
 # Example: tokenizer = tf.keras.preprocessing.text.Tokenizer(...)
 # tokenizer.fit_on_texts(...)  # if you have a fixed vocabulary
 
@@ -56,43 +60,48 @@ def predict_polarity(text: str) -> (int, float):
     confidence = float(np.max(proba))
     return polarity, confidence
 
-def generate_opposite_polarity_text(original_text: str, original_polarity: int) -> str:
+def generate_opposite_polarity_text(original_text: str, original_polarity: int, model=generation_model) -> str:
     """
     Generate text with the opposite polarity using the generation model.
-    This is a placeholder function. You must implement it according to how
-    your generation model is intended to be used.
-    
-    original_polarity: 0 or 1
-    opposite_polarity: If original_polarity=0 (negative), we want positive text.
-                       If original_polarity=1 (positive), we want negative text.
+    This version uses a loaded Hugging Face model (e.g., T5) and tokenizer
+    to generate the transformed text.
+
+    Args:
+        original_text (str): The original review text.
+        original_polarity (int): 0 for negative, 1 for positive.
+
+    Returns:
+        str: The transformed review with opposite polarity.
     """
+    # Determine opposite polarity
     opposite_polarity = 1 - original_polarity
 
-    # Example prompt construction:
-    # If the original text is positive, we want to generate a negative version.
-    # If it is negative, we want to generate a positive version.
+    # Construct prompt based on opposite polarity
     if opposite_polarity == 0:
+        # If opposite_polarity is 0, we want negative text
         prompt = f"Convert this review to a negative tone: {original_text}"
     else:
+        # If opposite_polarity is 1, we want positive text
         prompt = f"Convert this review to a positive tone: {original_text}"
 
-    # The following is a placeholder. If your model is a seq2seq, you may need to:
-    # 1. Tokenize the prompt
-    # 2. Use model.predict() or a custom generation method (e.g. greedy search, beam search)
-    # 3. Convert generated token indices back to text.
+    # Tokenize the prompt
+    input_ids = tokenizer.encode(prompt, return_tensors='pt')
+    input_ids = input_ids.to(model.device)  # Move to the same device as the model if necessary
 
-    # Placeholder logic (replace with actual generation code):
-    # Example: assume a seq2seq model that takes a tokenized prompt and returns token IDs
-    # tokenized = tokenizer.texts_to_sequences([prompt])
-    # padded = tf.keras.preprocessing.sequence.pad_sequences(tokenized, maxlen=MAX_LEN)
-    # generated_ids = generation_model.predict(padded)
-    # generated_text = tokenizer.sequences_to_texts(generated_ids)
-    # return generated_text[0]
+    # Generate output using the model
+    # Adjust parameters like max_length, num_beams, etc., as needed
+    outputs = model.generate(
+        input_ids,
+        max_length=128,
+        num_beams=5,
+        early_stopping=True
+    )
 
-    # Since this is a placeholder, let's just return a mock string:
-    generated_text = f"[Generated { 'negative' if opposite_polarity == 0 else 'positive'} text for: '{original_text}']"
+    # Decode the generated output
+    generated_text = tokenizer.decode(outputs[0], skip_special_tokens=True)
 
     return generated_text
+
 
 
 @app.post("/polarity", summary="Predict polarity of a given review text.")
