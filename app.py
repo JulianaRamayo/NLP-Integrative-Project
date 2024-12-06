@@ -29,9 +29,9 @@ except Exception as e:
     raise RuntimeError(f"Could not load logistic_model.pkl: {e}")
 
 try:
-    generation_model = load_model("fine_tunned-model.h5")  # Assuming a keras model
+    generation_model = load_model("enc-dec_model.h5")  # Assuming a keras model
 except Exception as e:
-    raise RuntimeError(f"Could not load fine_tunned-model.h5: {e}")
+    raise RuntimeError(f"Could not load enc-dec_model.h5: {e}")
 
 # Dummy tokenizer or preprocessing if needed for generation model
 # You should replace this with the actual tokenizer/preprocessing steps
